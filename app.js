@@ -224,7 +224,7 @@ angular
       // Function to toggle the visibility of the search controls
       $scope.toggleSearchControls = function () {
         if ($scope.showSearchControls) {
-          $scope.clearSearch();
+          //$scope.clearSearch();
         } else {
           // Focus the search input after showing the search controls
           $timeout(function () {
@@ -239,19 +239,7 @@ angular
         $scope.showSearchControls = !$scope.showSearchControls;
       };
 
-      $scope.toggleDisplayMode = function () {
-        $scope.displayMode = $scope.displayMode === "single" ? "all" : "single";
-        pageCache = {}; // Clear the cache
-
-        // Disconnect observers when switching modes
-        disconnectPageObservers();
-
-        if ($scope.displayMode === "single") {
-          renderPage($scope.currentPage);
-        } else {
-          renderAllPages();
-        }
-      };
+      
 
       // Download PDF function
       $scope.downloadPdf = function () {
@@ -317,27 +305,24 @@ angular
           $scope.zoomLevel = value / 100; // Assuming zoomLevel is a fraction (e.g., 1 for 100%)
           $scope.presetZoom = value; // Update the preset zoom value
           pageCache = {}; // Clear the cache
+          // Disconnect existing observers and clear page containers
+          disconnectPageObservers();
       
-          if ($scope.displayMode === "single") {
-            renderPage($scope.currentPage);
-          } else {
-            // Disconnect existing observers and clear page containers
-            disconnectPageObservers();
-      
-            // Re-render all pages and set up new observers
-            renderAllPages().then(() => {
-              // Restore the scroll position after zooming
-              if (scrollPosition) {
-                const pageContainer = document.getElementById(
-                  `page-container-${scrollPosition.pageNumber}`
-                );
-                if (pageContainer) {
-                  pageContainer.scrollIntoView();
-                  window.scrollBy(0, scrollPosition.offsetWithinPage);
-                }
+          // Re-render all pages and set up new observers
+          renderAllPages().then(() => {
+            // Restore the scroll position after zooming
+            if (scrollPosition) {
+              const pageContainer = document.getElementById(
+                `page-container-${scrollPosition.pageNumber}`
+              );
+              if (pageContainer) {
+                pageContainer.scrollIntoView();
+                window.scrollBy(0, scrollPosition.offsetWithinPage);
               }
-            });
-          }
+            }
+          });          
+          
+            
         }
       };
 
@@ -356,13 +341,9 @@ angular
       $scope.resetZoom = function () {
         $scope.zoomLevel = $scope.defaultZoomLevel;
         pageCache = {}; // Clear the cache
-        if ($scope.displayMode === "single") {
-          renderPage($scope.currentPage);
-        } else {
-          // Disconnect observers and re-render all pages
-          disconnectPageObservers();
-          renderAllPages();
-        }
+        // Disconnect observers and re-render all pages
+        disconnectPageObservers();
+        renderAllPages();                  
       };
 
       $scope.togglePageFitWidth = function () {
@@ -538,26 +519,21 @@ angular
               .then(function (pageIndex) {
                 const pageNumber = pageIndex + 1; // Page index is zero-based
                 $scope.currentPage = pageNumber;
-                if ($scope.displayMode === "single") {
-                  // In single-page mode, render the page
-                  renderPage($scope.currentPage);
+               // In all-pages mode, scroll to the page
+               $timeout(function () {
+                const pageContainer = document.getElementById(
+                  `page-container-${pageNumber}`
+                );
+                if (pageContainer) {
+                  pageContainer.scrollIntoView({ behavior: "smooth" });
+                  highlightPageContainer(pageContainer, 1000);
                 } else {
-                  // In all-pages mode, scroll to the page
-                  $timeout(function () {
-                    const pageContainer = document.getElementById(
-                      `page-container-${pageNumber}`
-                    );
-                    if (pageContainer) {
-                      pageContainer.scrollIntoView({ behavior: "smooth" });
-                      highlightPageContainer(pageContainer, 1000);
-                    } else {
-                      console.error(
-                        "Page container not found for page",
-                        pageNumber
-                      );
-                    }
-                  }, 0);
+                  console.error(
+                    "Page container not found for page",
+                    pageNumber
+                  );
                 }
+              }, 0);
                 $scope.$applyAsync();
               })
               .catch(handleError);
@@ -899,17 +875,13 @@ angular
 
       $scope.firstPage = function () {
         $scope.currentPage = 1;
-        if ($scope.displayMode === "single") {
-          renderPage($scope.currentPage);
-        } else {
-          // Scroll to the specific page container
-          const pageContainer = document.getElementById(
-            `page-container-${$scope.currentPage}`
-          );
-          if (pageContainer) {
-            pageContainer.scrollIntoView({ behavior: "smooth" });
-            highlightPageContainer(pageContainer, 1000);
-          }
+        // Scroll to the specific page container
+        const pageContainer = document.getElementById(
+          `page-container-${$scope.currentPage}`
+        );
+        if (pageContainer) {
+          pageContainer.scrollIntoView({ behavior: "smooth" });
+          highlightPageContainer(pageContainer, 1000);
         }
         $scope.showToast("At beginning of document");
       };
@@ -917,16 +889,12 @@ angular
       $scope.prevPage = function () {
         if ($scope.currentPage > 1) {
           $scope.currentPage--;
-          if ($scope.displayMode === "single") {
-            renderPage($scope.currentPage);
-          } else {
-            const pageContainer = document.getElementById(
-              `page-container-${$scope.currentPage}`
-            );
-            if (pageContainer) {
-              pageContainer.scrollIntoView({ behavior: "smooth" });
-              highlightPageContainer(pageContainer, 1000);
-            }
+          const pageContainer = document.getElementById(
+            `page-container-${$scope.currentPage}`
+          );
+          if (pageContainer) {
+            pageContainer.scrollIntoView({ behavior: "smooth" });
+            highlightPageContainer(pageContainer, 1000);
           }
         } else {
           $scope.showToast("At beginning of document");
@@ -936,16 +904,12 @@ angular
       $scope.nextPage = function () {
         if ($scope.currentPage < $scope.totalPages) {
           $scope.currentPage++;
-          if ($scope.displayMode === "single") {
-            renderPage($scope.currentPage);
-          } else {
-            const pageContainer = document.getElementById(
-              `page-container-${$scope.currentPage}`
-            );
-            if (pageContainer) {
-              pageContainer.scrollIntoView({ behavior: "smooth" });
-              highlightPageContainer(pageContainer, 1000);
-            }
+          const pageContainer = document.getElementById(
+            `page-container-${$scope.currentPage}`
+          );
+          if (pageContainer) {
+            pageContainer.scrollIntoView({ behavior: "smooth" });
+            highlightPageContainer(pageContainer, 1000);
           }
         } else {
           $scope.showToast("At end of document");
@@ -954,17 +918,13 @@ angular
 
       $scope.lastPage = function () {
         $scope.currentPage = $scope.totalPages;
-        if ($scope.displayMode === "single") {
-          renderPage($scope.currentPage);
-        } else {
-          // Scroll to the specific page container
-          const pageContainer = document.getElementById(
-            `page-container-${$scope.currentPage}`
-          );
-          if (pageContainer) {
-            pageContainer.scrollIntoView({ behavior: "smooth" });
-            highlightPageContainer(pageContainer, 1000);
-          }
+        // Scroll to the specific page container
+        const pageContainer = document.getElementById(
+          `page-container-${$scope.currentPage}`
+        );
+        if (pageContainer) {
+          pageContainer.scrollIntoView({ behavior: "smooth" });
+          highlightPageContainer(pageContainer, 1000);
         }
         $scope.showToast("At end of document");
       };
@@ -974,17 +934,13 @@ angular
           {
             $scope.currentPage = $scope.gotoPageNumber - $scope.pageOffset;
             $scope.gotoPageNumber = null; // Clear the input field
-            if ($scope.displayMode === "single") {
-              renderPage($scope.currentPage);
-            } else {
-              // Scroll to the specific page container
-              const pageContainer = document.getElementById(
-                `page-container-${$scope.currentPage}`
-              );
-              if (pageContainer) {
-                pageContainer.scrollIntoView({ behavior: "smooth" });
-                highlightPageContainer(pageContainer, 1000);
-              }
+            // Scroll to the specific page container
+            const pageContainer = document.getElementById(
+              `page-container-${$scope.currentPage}`
+            );
+            if (pageContainer) {
+              pageContainer.scrollIntoView({ behavior: "smooth" });
+              highlightPageContainer(pageContainer, 1000);
             }
           } else {
             if ($scope.gotoPageNumber < 1) {
@@ -1025,27 +981,22 @@ angular
               .then(function (pageIndex) {
                 const pageNumber = pageIndex + 1; // Page index is zero-based
                 $scope.currentPage = pageNumber;
-                if ($scope.displayMode === "single") {
-                  // In single page mode, set the current page and render it
-                  renderPage($scope.currentPage);
-                } else {
-                  // In all pages mode, scroll to the desired page
-                  $timeout(function () {
-                    const pageContainer = document.getElementById(
-                      "page-container-" + pageNumber
+                 // In all pages mode, scroll to the desired page
+                 $timeout(function () {
+                  const pageContainer = document.getElementById(
+                    "page-container-" + pageNumber
+                  );
+                  if (pageContainer) {
+                    pageContainer.scrollIntoView({ behavior: "smooth" });
+                    // Optionally, highlight the target page
+                    highlightPageContainer(pageContainer, 1000);
+                  } else {
+                    console.error(
+                      "Page container not found for page",
+                      pageNumber
                     );
-                    if (pageContainer) {
-                      pageContainer.scrollIntoView({ behavior: "smooth" });
-                      // Optionally, highlight the target page
-                      highlightPageContainer(pageContainer, 1000);
-                    } else {
-                      console.error(
-                        "Page container not found for page",
-                        pageNumber
-                      );
-                    }
-                  }, 0);
-                }
+                  }
+                }, 0);
                 $scope.$applyAsync();
               })
               .catch(handleError);
@@ -1145,43 +1096,35 @@ angular
               if ($scope.searchResults.length > 0) {
                 $scope.currentSearchResultIndex = 0;
                 // Define firstResult here
-                const result = $scope.searchResults[0];
-
-                if ($scope.displayMode === "single") {
-                  console.log("First search result:", result);
-                  $scope.currentPage = result.page;
-                  renderPage($scope.currentPage);
+                // In all pages mode
+                const result =
+                $scope.searchResults[$scope.currentSearchResultIndex];
+              const pageNumber = result.page;
+              const pageContainer = document.getElementById(
+                `page-container-${pageNumber}`
+              );
+              if (pageContainer) {
+                // Check if the page is rendered
+                if (pageContainer.rendered) {
+                  pageContainer.scrollIntoView({ behavior: "smooth" });
+                  highlightSearchResultOnPage(pageNumber);
                 } else {
-                  // In all pages mode
-                  const result =
-                    $scope.searchResults[$scope.currentSearchResultIndex];
-                  const pageNumber = result.page;
-                  const pageContainer = document.getElementById(
-                    `page-container-${pageNumber}`
-                  );
-                  if (pageContainer) {
-                    // Check if the page is rendered
-                    if (pageContainer.rendered) {
+                  // Render the page first
+                  renderPageLazy(pageNumber, pageContainer).then(
+                    function () {
+                      pageContainer.rendered = true;
                       pageContainer.scrollIntoView({ behavior: "smooth" });
                       highlightSearchResultOnPage(pageNumber);
-                    } else {
-                      // Render the page first
-                      renderPageLazy(pageNumber, pageContainer).then(
-                        function () {
-                          pageContainer.rendered = true;
-                          pageContainer.scrollIntoView({ behavior: "smooth" });
-                          highlightSearchResultOnPage(pageNumber);
-                        }
-                      );
                     }
-                    highlightPageContainer(pageContainer, 500);
-                  } else {
-                    console.error(
-                      "Page container not found for page",
-                      pageNumber
-                    );
-                  }
+                  );
                 }
+                highlightPageContainer(pageContainer, 500);
+              } else {
+                console.error(
+                  "Page container not found for page",
+                  pageNumber
+                );
+              }
               } else {
                 $scope.showToast("Search text not found. Try again.");
                 $scope.isSearch = false;
@@ -1199,36 +1142,27 @@ angular
         if ($scope.currentSearchResultIndex < $scope.searchResults.length - 1) {
           $scope.currentSearchResultIndex++;
           const result = $scope.searchResults[$scope.currentSearchResultIndex];
-          if ($scope.displayMode === "single") {
-            if (result.page !== $scope.currentPage) {
-              $scope.currentPage = result.page;
-              renderPage($scope.currentPage);
+          // In all page mode
+          const pageNumber = result.page;
+          const pageContainer = document.getElementById(
+            `page-container-${pageNumber}`
+          );
+          if (pageContainer) {
+            // Check if the page is rendered
+            if (pageContainer.rendered) {
+              pageContainer.scrollIntoView({ behavior: "smooth" });
+              highlightSearchResultOnPage(pageNumber);
             } else {
-              highlightSearchResult();
-            }
-          } else {
-            // In all page mode
-            const pageNumber = result.page;
-            const pageContainer = document.getElementById(
-              `page-container-${pageNumber}`
-            );
-            if (pageContainer) {
-              // Check if the page is rendered
-              if (pageContainer.rendered) {
+              // Render the page first
+              renderPageLazy(pageNumber, pageContainer).then(function () {
+                pageContainer.rendered = true;
                 pageContainer.scrollIntoView({ behavior: "smooth" });
                 highlightSearchResultOnPage(pageNumber);
-              } else {
-                // Render the page first
-                renderPageLazy(pageNumber, pageContainer).then(function () {
-                  pageContainer.rendered = true;
-                  pageContainer.scrollIntoView({ behavior: "smooth" });
-                  highlightSearchResultOnPage(pageNumber);
-                });
-              }
-              highlightPageContainer(pageContainer, 500);
-            } else {
-              console.error("Page container not found for page", pageNumber);
+              });
             }
+            highlightPageContainer(pageContainer, 500);
+          } else {
+            console.error("Page container not found for page", pageNumber);
           }
         } else {
           // If the last search result is reached, show a toast message
@@ -1240,36 +1174,27 @@ angular
         if ($scope.currentSearchResultIndex > 0) {
           $scope.currentSearchResultIndex--;
           const result = $scope.searchResults[$scope.currentSearchResultIndex];
-          if ($scope.displayMode === "single") {
-            if (result.page !== $scope.currentPage) {
-              $scope.currentPage = result.page;
-              renderPage($scope.currentPage);
+          // In all page mode
+          const pageNumber = result.page;
+          const pageContainer = document.getElementById(
+            `page-container-${pageNumber}`
+          );
+          if (pageContainer) {
+            // Check if the page is rendered
+            if (pageContainer.rendered) {
+              pageContainer.scrollIntoView({ behavior: "smooth" });
+              highlightSearchResultOnPage(pageNumber);
             } else {
-              highlightSearchResult();
-            }
-          } else {
-            // In all page mode
-            const pageNumber = result.page;
-            const pageContainer = document.getElementById(
-              `page-container-${pageNumber}`
-            );
-            if (pageContainer) {
-              // Check if the page is rendered
-              if (pageContainer.rendered) {
+              // Render the page first
+              renderPageLazy(pageNumber, pageContainer).then(function () {
+                pageContainer.rendered = true;
                 pageContainer.scrollIntoView({ behavior: "smooth" });
                 highlightSearchResultOnPage(pageNumber);
-              } else {
-                // Render the page first
-                renderPageLazy(pageNumber, pageContainer).then(function () {
-                  pageContainer.rendered = true;
-                  pageContainer.scrollIntoView({ behavior: "smooth" });
-                  highlightSearchResultOnPage(pageNumber);
-                });
-              }
-              highlightPageContainer(pageContainer, 500);
-            } else {
-              console.error("Page container not found for page", pageNumber);
+              });
             }
+            highlightPageContainer(pageContainer, 500);
+          } else {
+            console.error("Page container not found for page", pageNumber);
           }
         } else {
           // If the first search result is reached, show a toast message
@@ -1309,15 +1234,12 @@ angular
         $scope.currentSearchResultIndex = -1;
         pageCache = {}; // Clear the cache
 
-        // Re-render the current page to remove highlights
-        if ($scope.displayMode === "single") {
-          renderPage($scope.currentPage);
-        } else {
-          // Disconnect observers and re-render all pages
-          disconnectPageObservers();
-          renderAllPages();
-        }
 
+        // Re-render the current page to remove highlights
+        // Disconnect observers and re-render all pages
+        disconnectPageObservers();
+        renderAllPages();
+        
         // Focus the search input after clearing the search
         $timeout(function () {
           var searchInput = $document[0].querySelector(
@@ -1355,79 +1277,6 @@ angular
             const result =
               $scope.searchResults[$scope.currentSearchResultIndex];
 
-            if ($scope.displayMode === "single") {
-              if (result.page === $scope.currentPage) {
-                const canvas = pageCache[$scope.currentPage];
-                if (canvas) {
-                  let context;
-                  try {
-                    context = canvas.getContext("2d", {
-                      willReadFrequently: true,
-                    });
-                  } catch (e) {
-                    context = canvas.getContext("2d");
-                  }
-                  try {
-                    if (!pageObjectCache[$scope.currentPage]) {
-                      pageObjectCache[$scope.currentPage] =
-                        await pdfDoc.getPage($scope.currentPage);
-                    }
-                    const page = pageObjectCache[$scope.currentPage];
-                    const viewport = page.getViewport({
-                      scale: $scope.zoomLevel,
-                    });
-
-                    if (!canvas.originalImageData) {
-                      await page.render({
-                        canvasContext: context,
-                        viewport: viewport,
-                      }).promise;
-                      canvas.originalImageData = context.getImageData(
-                        0,
-                        0,
-                        canvas.width,
-                        canvas.height
-                      );
-                    } else {
-                      context.putImageData(canvas.originalImageData, 0, 0);
-                    }
-
-                    let [x1, y1, x2, y2] = viewport.convertToViewportRectangle([
-                      result.x,
-                      result.y,
-                      result.x + result.width,
-                      result.y + result.height,
-                    ]);
-
-                    let rectX = x1;
-                    let rectY = Math.min(y1, y2);
-                    let rectWidth = x2 - x1;
-                    let rectHeight = Math.abs(y2 - y1);
-
-                    context.save();
-                    context.fillStyle = "rgba(0, 255, 0, 0.5)";
-                    context.fillRect(rectX, rectY, rectWidth, rectHeight);
-                    context.restore();
-                  } catch (error) {
-                    handleError(
-                      new Error(
-                        `Error highlighting search result: ${error.message}`
-                      )
-                    );
-                  }
-                } else {
-                  handleError(
-                    new Error(
-                      "Canvas not found for highlighting search result."
-                    )
-                  );
-                }
-              } else {
-                $scope.currentPage = result.page;
-                await renderPage($scope.currentPage);
-                await highlightSearchResult();
-              }
-            } else {
               const pageContainer = document.getElementById(
                 `page-container-${result.page}`
               );
@@ -1435,7 +1284,6 @@ angular
                 pageContainer.scrollIntoView({ behavior: "smooth" });
                 await highlightSearchResultOnPage(result.page);
               }
-            }
           }
         } catch (error) {
           handleError(
