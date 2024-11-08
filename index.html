@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html ng-app="pdfApp">
+
+<head>
+  <title>ATOM Viewer</title>
+  <link rel="stylesheet" href="./angular/angular-material.min.css" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="./angular/angular.min.js"></script>
+  <script src="./angular/angular-animate.min.js"></script>
+  <script src="./angular/angular-aria.min.js"></script>
+  <script src="./angular/angular-messages.min.js"></script>
+  <script src="./angular/angular-material.min.js"></script>
+  <script src="./pdfjs-2.16.105/pdf.min.js"></script>
+  
+  <script src="./app.js"></script>
+</head>
+
+<body ng-cloak ng-controller="PdfController">
+
+  <!-- Toolbar Container -->
+  <div class="toolbar-container">
+    <!-- PDF Controls Toolbar -->
+    <md-toolbar class="md-primary">
+      <div class="md-toolbar-tools" layout="row" layout-align="start center" layout-wrap>
+        <!-- Left-aligned buttons -->
+        <div layout="row" layout-align="start center" flex>
+          <!-- Add a button to toggle md-is-locked-open -->
+          <md-button class="small-button" ng-click="toggleLockedOpen()" aria-label="Toggle Lock">
+            <md-icon class="material-icons">{{isLockedOpen ? 'menu_open' : 'list'}}</md-icon>
+            <md-tooltip>{{isLockedOpen ? 'Hide Table of Contents' : 'Show Table of Contents'}}</md-tooltip>
+          </md-button>
+
+          <!-- Existing PDF control buttons -->
+          <!--Go To Page Number Input -->
+          <span style="white-space: nowrap">
+            <input type="text" id="page" ng-model="gotoPageNumber" ng-value="currentPage" pattern="\d*" min="1"
+              max="{{totalPages}}" ng-keypress="checkEnterGoToPage($event)"
+              ng-click="selectText($event)"
+              ng-style="{'width': (totalPages.toString().length + 2) + 'ch', 'text-align': 'center', 'color': 'white'}"
+              style="border: 1px solid white; background-color: rgb(62, 61, 61); font-size: 14px" /><span
+              class="small-font"> of {{totalPages}}</span>
+          </span>
+        </div>
+        <!-- Center-aligned buttons -->
+        <div layout="row" layout-align="center center" flex>
+
+          <!-- Combined Page Fit/Page Width button -->
+          <md-button class="small-button" ng-click="togglePageFitWidth()" aria-label="Toggle Page Fit/Width">
+            <md-icon class="material-icons">{{isSetPageWidth ? 'expand' : 'sync_alt'}}</md-icon>
+            <md-tooltip>{{isSetPageWidth ? 'Fit to page' : 'Fit to Width'}}</md-tooltip>
+          </md-button>
+
+          <!-- Zoom Percentage -->
+          <md-button class="small-button" ng-click="openZoomDropdown($event)">
+            {{getRoundedZoom()}}%
+            <md-tooltip>Preset Zoom</md-tooltip>
+          </md-button>
+          <!-- Zoom Dropdown -->
+          <md-select class="no-underline hide-selected-value custom-width no-arrow no-scroll" ng-model="selectedZoom"
+            ng-change="setZoom(selectedZoom)" aria-label="Zoom Level">
+            <md-option ng-repeat="zoom in zoomOptions" ng-value="zoom">{{zoom}}%</md-option>
+          </md-select>
+        </div>
+
+
+        <!-- Right-aligned buttons -->
+        <div layout="row" layout-align="end center" flex>
+
+          <!-- Search Controls Toolbar -->
+          <div layout="row" layout-align="center center" flex ng-show="showSearchControls">
+            <md-divider></md-divider>
+            <md-input-container md-no-float>
+              <input type="search" aria-label="search" placeholder="Find" ng-model="searchText"
+                ng-click="selectText($event)" ng-keypress="checkEnter($event)" ng-style="{'width': '120px'}" />
+            </md-input-container>
+            <md-button class="small-button" ng-click="clearSearch()" aria-label="Clear Search"
+              ng-disabled="searchResults.length === 0">
+              <md-icon class="material-icons">clear</md-icon>
+              <md-tooltip>Clear Search</md-tooltip>
+            </md-button>
+
+            <md-button class="small-button" ng-click="prevSearchResult()" aria-label="Previous Search Result"
+              ng-disabled="searchResults.length === 0 || canvasIsRendering">
+              <md-icon class="material-icons">keyboard_arrow_upward</md-icon>
+              <md-tooltip>Previous Search Result</md-tooltip>
+            </md-button>
+            <md-button class="small-button" ng-click="nextSearchResult()" aria-label="Next Search Result"
+              ng-disabled="searchResults.length === 0 || canvasIsRendering">
+              <md-icon class="material-icons">keyboard_arrow_down</md-icon>
+              <md-tooltip>Next Search Result</md-tooltip>
+            </md-button>
+            <span>{{currentSearchResultIndex + 1}}/{{searchResults.length}}</span>
+            <md-divider></md-divider>
+          </div>
+
+        </div>
+        <!--Show Search and Hide Search -->
+        <md-button class="small-button" ng-click="toggleSearchControls()" aria-label="Search">
+          <md-icon class="material-icons">{{showSearchControls ? 'close' : 'search'}}</md-icon>
+          <md-tooltip>{{showSearchControls ? 'Close Find' : 'Find'}}</md-tooltip>
+        </md-button>
+        <!--Download or Save Document -->
+        <md-button class="small-button" ng-click="downloadPdf()" aria-label="Download Document">
+          <md-icon class="material-icons">save</md-icon>
+          <md-tooltip>Download Document</md-tooltip>
+        </md-button>
+        <!-- Full Screen -->
+        <md-button class="small-button" ng-click="toggleFullScreen()" aria-label="Full Screen">
+          <md-icon class="material-icons">{{isMaximized ? 'close_fullscreen' : 'open_in_full'}}</md-icon>
+          <md-tooltip>{{isMaximized ? 'Exit Full Screen' : 'Full Screen'}}</md-tooltip>
+        </md-button>          
+      </div>
+  </div>
+  </md-toolbar>
+
+  <!-- PDF Viewer Container -->
+  <div id="pdf-viewer-container" layout="row" flex>
+
+    <!-- Side Navigation for Document Outline -->
+    <md-sidenav class="md-sidenav-left" md-component-id="left" md-is-locked-open="isLockedOpen">
+      <md-content>
+        <div layout="row" layout-align="space-between center">
+          <md-button ng-click="toggleAllOutlines()" class="yellow-button"><md-icon class="small-button-collapse">{{
+              allOutlinesExpanded ? 'remove' : 'add' }}</md-icon>Table of Contents</md-button>
+        </div>
+        <div ng-if="documentOutline && documentOutline.length > 0">
+          <div ng-include="'outline_template.html'" ng-init="items = documentOutline"></div>
+        </div>
+        <div ng-if="!documentOutline || documentOutline.length === 0">
+          <p>No outline available for this document.</p>
+        </div>
+      </md-content>
+    </md-sidenav>
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" ng-show="isLoading">
+      <md-progress-circular md-diameter="80" md-mode="indeterminate"></md-progress-circular>
+      <md-progress-linear md-mode="indeterminate"></md-progress-linear>
+    </div>
+    <!-- PDF Viewer -->
+    <div id="pdf-viewer" style="position: relative"></div>
+  </div>
+
+
+  <!-- Include the outline template -->
+  <script type="text/ng-template" id="outline_template.html">
+      <nav>                          
+          <ul>
+              <li ng-repeat="item in items track by $index">
+                  <section>
+                      <!-- Toggle button for collapsing/expanding sub-items -->
+                      <md-button class="small-button-collapse" ng-if="item.items && item.items.length > 0" ng-click="item.expanded = !item.expanded">
+                          {{item.expanded ? '-' : '+'}}
+                      </md-button>
+                      <!-- Display the title and make it clickable -->
+                      <a href="" ng-click="goToDestination(item.dest)" class="outline-link">{{item.title}}</a>
+                      <!-- Recursively include sub-items if they exist and are expanded -->
+                      <div ng-if="item.expanded" class="sub-items">
+                          <div ng-include="'outline_template.html'" ng-init="items = item.items"></div>
+                      </div>
+                  </section>
+              </li>
+          </ul>
+      </nav>
+    </script>
+</body>
+
+</html>

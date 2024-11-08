@@ -1,0 +1,728 @@
+/*
+* Copyright 2016 Raytheon Company.
+* This software was developed pursuant to Contract Number DTFAWA-15-D-00004 with
+* the U.S. Government. The U.S. Government’s rights in and to this copyrighted
+* software are as specified in FAA AMS 3.5-13 Rights in Data - General (October
+* 2014) which was made part of the above contract.
+*
+* WARNING - This document contains Technical Data and / or technology whose
+* export or disclosure to Non-U.S. Persons, wherever located, is restricted by
+* the International Traffic in Arms Regulations (ITAR) (22 C.F.R. Section
+* 120-130) or the Export Administration Regulations (EAR) (15 C.F.R. Section
+* 730-774). This document CANNOT be exported (e.g., provided to a supplier
+* outside of the United States) or disclosed to a Non-U.S. Person, wherever
+* located, until a final Jurisdiction and Classification determination has been
+* completed and approved by Raytheon, and any required U.S. Government approvals
+* have been obtained. Violations are subject to severe criminal penalties.
+*/
+
+.statuspanel {
+    display: none !important;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+::-webkit-scrollbar {
+    width: 20px; /* for vertical scrollbars */
+    height: 20px; /* for horizontal scrollbars */
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(96, 96, 96, 0.7);
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+html,
+body {
+    -webkit-user-select: none;
+    -moz-user-select: -moz-none;
+    -ms-user-select: none;
+    user-select: none;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #ccccd0;
+}
+
+pre {
+    font-family: Roboto Mono, monospace;
+    font-style: normal;
+}
+
+*:focus {
+    outline: none;
+}
+
+input {
+    outline: none;
+}
+
+md-tabs [role="tabpanel"] {
+    transition: none;
+}
+
+md-sidenav,
+md-sidenav.md-locked-open,
+md-sidenav.md-closed.md-locked-open-add-active {
+    min-width: 200px !important;
+    width: 85vw !important;
+    max-width: 600px !important;
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 300;
+    src: local("Roboto Light"), local("Roboto-Light"), url(../fonts/roboto/Roboto-Light.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 400;
+    src: local("Roboto"), local("Roboto-Regular"), url(../fonts/roboto/Roboto-Regular.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: italic;
+    font-weight: 400;
+    src: local("Roboto Italic"), local("Roboto-Italic"), url(../fonts/roboto/Roboto-Italic.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 500;
+    src: local("Roboto Medium"), local("Roboto-Medium"), url(../fonts/roboto/Roboto-Medium.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 700;
+    src: local("Roboto Bold"), local("Roboto-Bold"), url(../fonts/roboto/Roboto-Bold.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: "RobotoMono";
+    font-style: normal;
+    font-weight: 300;
+    src: local("RobotoMono Light"), local("RobotoMono-Light"),
+        url(../fonts/robotomono/RobotoMono-Light.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: "RobotoMono";
+    font-style: normal;
+    font-weight: 400;
+    src: local("RobotoMono"), local("RobotoMono-Regular"),
+        url(../fonts/robotomono/RobotoMono-Regular.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: "RobotoMono";
+    font-style: italic;
+    font-weight: 400;
+    src: local("RobotoMono Italic"), local("RobotoMono-Italic"),
+        url(../fonts/robotomono/RobotoMono-Italic.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: "RobotoMono";
+    font-style: normal;
+    font-weight: 500;
+    src: local("RobotoMono Medium"), local("RobotoMono-Medium"),
+        url(../fonts/robotomono/RobotoMono-Medium.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: "RobotoMono";
+    font-style: normal;
+    font-weight: 700;
+    src: local("RobotoMono Bold"), local("RobotoMono-Bold"),
+        url(../fonts/robotomono/RobotoMono-Bold.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: "Material Icons";
+    font-style: normal;
+    font-weight: 400;
+    src: local("Material Icons"), local("MaterialIcons-Regular"),
+        url(../fonts/materialicons/MaterialIcons-Regular.ttf) format("truetype");
+}
+
+.material-icons {
+    font-family: "Material Icons";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 32px; /* Preferred icon size */
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;
+
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Support for IE. */
+    font-feature-settings: "liga";
+}
+
+md-radio-button[disabled] div.md-on {
+    background-color: #aaaaaa;
+}
+
+.awd-toolbar-btn {
+    min-width: 46px;
+}
+
+.awd-application-toolbar-btn {
+    min-width: 35px;
+    max-width: 35px;
+    margin: 0;
+    padding: 0;
+}
+
+.awd-application-toolbar-icn {
+    font-size: 22px;
+}
+
+.awd-application-login-btn {
+    min-width: 45px;
+    text-transform: none;
+    margin: 0;
+    padding-bottom: 4px;
+}
+
+.awd-application-login-icn {
+    font-size: 21px;
+}
+
+.awd-graphics-toolbar-btn {
+    min-width: 35px;
+    max-width: 35px;
+    margin: 0 0 4px 0;
+    padding: 0;
+}
+
+.awd-graphics-toolbar-expand-btn {
+    min-width: 27px;
+    max-width: 27px;
+    margin: 0;
+    padding: 0;
+}
+
+.awd-legend-overspill-btn {
+    min-width: 20px;
+    min-height: 15px;
+    height: 15px;
+    width: 20px;
+    line-height: 15px;
+    margin: 0;
+    border-radius: 0;
+    padding: 0;
+}
+
+.awd-overlay-manage-btn {
+    min-width: 20px;
+    min-height: 20px;
+    height: 20px;
+    width: 20px;
+    line-height: 20px;
+    margin: 0;
+    padding: 0;
+}
+
+.awd-graphics-toolbar-expand-icn {
+    font-size: 20px;
+}
+
+.awd-graphics-loop-toolbar-btn {
+    min-width: 24px;
+    min-height: 22px;
+    max-width: 24px;
+    max-height: 22px;
+    text-transform: none;
+    margin: 0;
+    padding: 0;
+    line-height: 24px;
+    font-size: small;
+}
+
+.awd-graphics-loop-toolbar-time-btn {
+    min-width: 29px;
+    min-height: 20px;
+    max-width: 20px;
+    max-height: 20px;
+    text-transform: none;
+    margin: 0 2px 0 2px;
+    padding: 0;
+    line-height: 20px;
+    font-size: small;
+    border-radius: 0;
+}
+
+.awd-alert-btn {
+    min-width: 45px;
+    max-width: 45px;
+    min-height: 45px;
+    max-height: 45px;
+    text-transform: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 7px;
+}
+
+.awd-alert-block {
+    position: absolute;
+    top: 11px;
+    left: 50%;
+    transform: translate(-50%, -11px);
+}
+
+.awd-graphics-loop-toolbar-icn {
+    font-size: 16px;
+}
+
+.awd-graphics-toolbar-icn {
+    font-size: 24px;
+}
+
+.awd-legend-toolbar-btn {
+    min-width: 22px;
+    min-height: 22px;
+    margin: 0;
+    padding: 0;
+}
+
+.awd-legend-toolbar-icn {
+    font-size: 20px;
+}
+
+.awd-preference-btn {
+    text-transform: none;
+    text-align: left;
+    font-size: medium;
+    font-style: normal;
+    font-weight: 400;
+}
+
+.awd-caption-btn {
+    min-width: 25px;
+}
+
+.awd-loop-btn {
+    min-width: 30px;
+}
+
+.awd-playback-btn {
+    min-width: 25px;
+    margin: 0;
+}
+
+.awd-selector-menu-option {
+    max-height: 35px;
+    line-height: 35px;
+    font-size: small;
+}
+
+.awd-custom-overlay-btn {
+    text-transform: none;
+    text-align: left;
+    min-width: 110px;
+    max-width: 110px;
+    margin: 0;
+}
+
+.awd-tools-btn {
+    min-width: 25px;
+}
+
+.awd-short-btn {
+    min-width: 20px;
+}
+
+.awd-small-btn {
+    min-width: 48px;
+    min-height: 28px;
+    line-height: 28px;
+    font-size: small;
+}
+
+.awd-very-short-btn {
+    min-width: 15px;
+}
+
+.awd-callout-btn {
+    min-width: 30px;
+    max-width: 30px;
+    min-height: 30px;
+    max-height: 30px;
+    margin: 0;
+    padding: 0;
+}
+
+.awd-callout-details-btn {
+    min-width: 80px;
+    max-width: 80px;
+    min-height: 30px;
+    max-height: 30px;
+    margin: 0;
+    padding: 0;
+}
+
+.awd-settings-airport-btn {
+    min-width: 25px;
+    max-width: 25px;
+    min-height: 25px;
+    max-height: 25px;
+    margin: 0;
+    padding: 0;
+    line-height: 25px;
+}
+
+.awd-callout-icn {
+    line-height: 16px;
+    font-size: 19px;
+    font-weight: 200;
+}
+
+.awd-viewtitlebar-btn {
+    min-width: 28px;
+    max-width: 28px;
+    min-height: 28px;
+    margin: 0;
+    padding: 0;
+}
+
+.awd-viewtitlebar-icn {
+    line-height: 21px;
+    font-size: 18px;
+    font-weight: 200;
+}
+
+.awd-submenu-btn {
+    text-transform: none;
+    min-width: 35px;
+    min-height: 35px;
+    margin: 0;
+}
+
+.awd-viewproducts-btn {
+    text-align: left;
+    font-size: 16px;
+}
+
+.awd-settings-btn {
+    min-width: 50px;
+}
+
+.awd-tree-btn {
+    min-width: 40px;
+    margin: 0;
+}
+
+.awd-keyboard-btn {
+    min-width: 45px;
+    min-height: 45px;
+    margin: 7px;
+    text-transform: none;
+    font-size: 19px;
+}
+
+.awd-context-menu-btn {
+    min-width: 45px;
+    min-height: 25px;
+    line-height: 25px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding: 0 3px 0 3px;
+    font-weight: 400;
+    text-transform: none;
+    text-align: left;
+}
+
+.awd-looping-view {
+    border-style: solid;
+    border-width: 4px;
+    border-color: green;
+}
+
+.awd-add-view-btn {
+    text-transform: none;
+}
+
+.awd-dock-btn {
+    text-transform: none;
+    font-size: small;
+    min-width: 10px;
+    text-overflow: ellipsis;
+    min-height: 24px;
+    line-height: 24px;
+    max-height: 24px;
+    border-radius: 0;
+    margin: 0 0 0 5px;
+}
+
+.awd-view-options-btn {
+    min-width: 30px;
+}
+
+.awd-stripe-0 {
+    background-color: white;
+}
+
+.awd-stripe-1 {
+    background-color: #eeeeee;
+}
+
+.awd-static-image-message {
+    font-size: 40pt;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.awd-section-header {
+    text-transform: uppercase;
+}
+
+.awd-radar-select {
+    font-size: medium;
+    text-transform: capitalize;
+}
+
+.awd-list-item {
+    padding: 0;
+    margin: 0;
+}
+
+.awd-menu-no-max-height {
+    max-height: none;
+}
+
+.md-chips {
+    box-shadow: 0 0 !important;
+}
+
+.awd-custom-chips md-chip {
+    position: relative;
+    font-size: small;
+}
+
+.awd-input-clear {
+    margin-top: 1px;
+    text-align: center;
+    line-height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    width: 18px;
+    height: 18px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.awd-custom-chips md-chip .md-chip-remove-container {
+    position: absolute;
+    right: 7px;
+    top: 7px;
+    margin-right: 0;
+    height: 20px;
+}
+
+.awd-custom-chips md-chip .md-chip-remove-container button.radarselector {
+    position: relative;
+    height: 18px;
+    width: 18px;
+    line-height: 25px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 50%;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+    transition: background 0.15s linear;
+    display: block;
+}
+
+.awd-custom-chips md-chip .md-chip-remove-container button.radarselector md-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate3d(-50%, -50%, 0) scale(0.4);
+}
+
+.awd-no-padding {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.awd-map-tooltip {
+    position: relative;
+    background: rgba(255, 153, 0, 1);
+    color: black;
+    font-size: x-small;
+    padding: 5px 5px;
+    opacity: 1;
+    white-space: nowrap;
+}
+
+.awd-map-tooltip:before {
+    border-top: 5px solid rgba(255, 153, 0, 1);
+    border-right: 5px solid transparent;
+    border-left: 5px solid transparent;
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    margin-left: -5px;
+    left: 50%;
+}
+
+.awd-map-tooltip:before {
+    border-top-color: rgb(255, 153, 0);
+}
+
+.awd-preference-edit-entry {
+    min-height:40px;
+    height:40px;
+    overflow: hidden;    
+}
+
+.awd-indicator {
+    position: relative;
+    -ms-flex: 0 1 auto;
+    flex: 0 1 auto;
+    margin-right: 8px;
+    margin-left: 8px;
+    text-indent: -999px;
+    background-color: rgba(255, 255, 255, 0.5);
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.awd-indicator .active {
+    background-color: #fff;
+    width: 0.9rem;
+    height: 0.9rem;
+}
+
+.awd-image-toolbar-btn {
+    min-width: 35px;
+    max-width: 35px;
+    margin: 0 0 4px 0;
+    padding: 0;
+    border-radius: 0;
+}
+
+.awd-ol-scale-line {
+    background: rgba(68, 68, 68, 0.8);
+    padding: 10px;
+    width: 180px;
+}
+
+.awd-ol-scale-line-inner {
+    border: 1px solid rgba(255, 255, 60, 0.76);
+    border-top: none;
+    color: rgba(255, 255, 60, 0.76);
+    font-size: 12px;
+    text-align: center;
+    margin: 1px;
+    will-change: contents, width;
+}
+
+.awd-product-filter-btn {
+    min-width: 30px;
+    min-height: 25px;
+    height: 25px;
+    line-height: 25px;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    font: x-small;
+    border-radius: 0;
+}
+
+.awd-rangering-location-select-header {
+}
+
+.awd-options-filter-enum-select-header {
+}
+
+/* These selectors only apply to children of elements with the 'awd-rangering-location-select-header' class */
+.awd-rangering-location-select-header .header-searchbox {
+    border: none;
+    outline: none;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+}
+
+.awd-options-filter-enum-select-header .awd-rangering-location-select-header .select-header {
+    box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.1), 0 0 0 0 rgba(0, 0, 0, 0.14), 0 0 0 0 rgba(0, 0, 0, 0.12);
+    padding-left: 10.667px;
+    height: 48px;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: auto;
+}
+
+.awd-rangering-location-select-header .select-header {
+    max-height: 240px;
+}
+
+.awd-tools-table {
+    padding: 10px;
+    border: 1px solid;
+    border-collapse: collapse;
+    white-space: pre-wrap;
+}
+
+.awd-options-filter-enum-select-header {
+}
+
+/* These selectors only apply to children of elements with the 'awd-rangering-location-select-header' class */
+.awd-options-filter-enum-select-header .header-searchbox {
+    border: none;
+    outline: none;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+}
+.awd-options-filter-enum-select-header .select-header {
+    box-shadow: 0 0 0 0;
+    height: 30px;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: auto;
+}
+.awd-options-filter-enum-select-header .select-header {
+    max-height: 240px;
+}
