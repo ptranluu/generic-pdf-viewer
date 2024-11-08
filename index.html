@@ -73,7 +73,7 @@
               <input type="search" aria-label="search" placeholder="Find" ng-model="searchText"
                 ng-click="selectText($event)" ng-keypress="checkEnter($event)" ng-style="{'width': '120px'}" />
             </md-input-container>
-            <md-button class="small-button" ng-click="clearSearch()" aria-label="Clear Search"
+            <md-button class="small-button" ng-click="toggleSearchControls()" aria-label="Close Find"
               ng-disabled="searchResults.length === 0">
               <md-icon class="material-icons">clear</md-icon>
               <md-tooltip>Clear Search</md-tooltip>

@@ -1207,7 +1207,7 @@ angular
         if (event.keyCode === 13) {
           // Enter key code
           let searchText = $scope.searchText;
-          $scope.clearSearch();
+          //$scope.clearSearch();
           $scope.searchText = searchText;
           $scope.search();
           $scope.selectText(event);
