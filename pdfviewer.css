@@ -1,0 +1,323 @@
+/* pdfviewer.css formerly styles.css */
+
+body {
+  display: flex;
+  flex-direction: column; /* Change to column to stack toolbar and viewer */
+  /*justify-content: center;*/
+  justify-content: flex-start; /* Align to the top */
+  /*align-items: flex-start; /* Align to the top */
+  align-items: stretch; /* Stretch to fill the width */
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  overflow: hidden; /* Prevent body scroll when sidenav is open */
+  /*padding-top: 1px; /* Adjust based on the height of your toolbar */
+}
+
+:root {
+  --primary-color: #6200ea;
+  --primary-hover-color: #3700b3;
+  --icon-color: #ff5722;
+  --background-color: #121212;
+  --lighter-background-color: #1e1e1e;
+  --text-color: #ffffff;
+  --input-background-color: #333333;
+  --input-border-color: #555555;
+  --placeholder-color: #aaaaaa;
+  --highlight-background-color: blue;
+  --highlight-text-color: white;
+}
+
+@font-face {
+  font-family: 'Material Icons';
+  src: url('fonts/material-icons/MaterialIcons-Regular.woff2') format('woff2'),
+       url('fonts/material-icons/MaterialIcons-Regular.woff') format('woff'),
+       url('fonts/material-icons/MaterialIcons-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  text-rendering: optimizeLegibility;
+}
+
+.icon-custom-color {
+  color: var(--icon-color);
+}
+
+#pdf-controls, #search-controls {
+  margin-bottom: 1px;
+}
+
+#pdf-viewer-container {
+  flex: 1; /* Take up remaining space */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: hidden;
+  position: relative;
+  margin-top: 70px; /* Adjust based on the height of your toolbar */
+}
+
+#pdf-viewer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  background-color: var(--lighter-background-color);
+  padding: 10px;
+  border-radius: 5px;
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  margin-top: 10px; /* Optional: Add some margin to the top */
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+#pdf-viewer canvas {
+  margin: 10px;
+}
+
+#pdf-viewer::-webkit-scrollbar {
+  width: 20px; /* Width of the scrollbar */
+}
+
+#pdf-viewer::-webkit-scrollbar-track {
+  background: #080808; /* Background of the scrollbar track */
+}
+
+#pdf-viewer::-webkit-scrollbar-thumb {
+  background-color: grey; /* Color of the scrollbar thumb */
+  border-radius: 6px; /* Rounded corners for the scrollbar thumb */
+  border: 3px solid #080808; /* Space around the scrollbar thumb */
+}
+
+#loading-indicator {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;  
+  padding: 20px;
+  border-radius: 10px;
+  
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: white;
+  z-index: 1000;
+  opacity: 0.9;
+  cursor: wait;
+}
+
+/* Set the pdf toolbar background color */
+md-toolbar {
+  background-color: rgb(63, 63, 63) !important; /* Background color */
+  color: white !important; /* Text color */  
+  position: fixed;
+}
+
+/* Adjust input search text color inside md-input-container */
+md-toolbar md-input-container input {  
+  background-color: rgb(44, 44, 44) !important;
+  color: white !important;
+}
+
+.white-label md-input-container label {
+  color: white; /* Set the label text color to white */
+}
+
+/* Custom tooltip styles */
+md-tooltip {
+  background-color: yellow !important; /* Custom background color */
+  color: black !important; /* Custom text color */
+  border: 1px solid black !important; /* White border */
+  padding: 1px; /* Optional: Add some padding for better appearance */
+  border-radius: 4px; /* Optional: Add border radius for rounded corners */
+}
+
+/* Outline Sidebar that is not locked in*/
+.md-sidenav-left {
+  position: fixed;
+  top: 70px; /* Adjust based on your toolbar height */
+  left: 0;
+  /* width: auto; */
+  background-color: #080808;
+  overflow-y: auto;
+  max-height: 100vh;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  padding: 5px;
+}
+
+.yellow-button {      
+  margin: 0;
+  color: gold;
+  
+}
+
+/* Custom scrollbar styles */
+.md-sidenav-left::-webkit-scrollbar {
+  width: 20px; /* Width of the scrollbar */
+}
+
+.md-sidenav-left::-webkit-scrollbar-track {
+  background: #080808; /* Background of the scrollbar track */
+}
+
+.md-sidenav-left::-webkit-scrollbar-thumb {
+  background-color: grey; /* Color of the scrollbar thumb */
+  border-radius: 6px; /* Rounded corners for the scrollbar thumb */
+  border: 3px solid #080808; /* Space around the scrollbar thumb */
+}
+
+/* Style the outline links */
+md-sidenav a {
+  color: #fdf9f9; /* White text */
+  text-decoration: none;
+  display: inline-block;
+  padding: 4px 0;
+}
+
+
+/* Optional: Adjust the list styles */
+md-sidenav ul {
+  list-style-type: none;
+  padding-left: 15px;
+}
+
+md-sidenav li {
+  margin-bottom: 4px;
+}
+
+
+.outline-link {
+  color: gold;
+  text-decoration: none; /* Optional: Remove underline */
+  font-size: 12px; /* Adjust the font size for the links as well */
+}
+
+.outline-link:hover {
+  text-decoration: underline; /* Optional: Add underline on hover */
+}
+
+.sub-items {
+  margin-left: 15px;
+}
+
+/* Ensure the toolbar and its contents are responsive */
+.md-toolbar-tools {
+  display: flex;
+  justify-content: center; /* Center the icons */  
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.md-toolbar-tools md-button {
+  flex: 0 1 auto; /* Allow buttons to grow and shrink as needed */
+}
+
+.md-toolbar-tools span {
+  flex: 0 1 auto; /* Allow spans to grow and shrink as needed */
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+.small-button {
+  margin: 0 2px; /* Remove margin */
+  font-size: 16px; /* Smaller font size */
+  padding: 2px 2px; /* Smaller padding */
+  min-height: 24px; /* Smaller height */
+  min-width: 24px; /* Smaller width */
+}
+
+.small-button md-tooltip {
+  font-size: 16px; /* Smaller tooltip text size */
+}
+
+/* Collapsible outline for table of contents*/
+.small-button-collapse {
+  font-size: 24px; /* Smaller font size */
+  padding: 0px 0px; /* Smaller padding */
+  min-height: 0px; /* Smaller height */
+  min-width: 0px; /* Smaller width */
+  height: auto; /* Set height to auto */
+  line-height: 1; /* Set line-height to 1 */
+  margin: 0; /* Remove margin */
+  color: gold;
+  cursor: pointer;
+}
+
+/* Prevent the toolbar from zooming */
+.toolbar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: inherit; /* Maintain the background color */
+  /*transform-origin: top left;
+  transform: scale(1); /* Prevent scaling */
+  width: 100%;
+}
+
+/* Custom styles for toolbar dividers */
+.md-toolbar-tools md-divider {
+  background-color: #ccc; /* Change the color of the divider */
+  height: 24px; /* Adjust the height of the divider */
+  margin: 0 8px; /* Add horizontal margin to space out the divider */
+  width: 1px; /* Adjust the width (thickness) of the divider */
+}
+
+.small-font {
+  font-size: 14px; /* Change this value to your desired font size */
+}
+
+.custom-toast {
+  margin-top: 70px; /* Adjust this value to match the height of your toolbar */
+}
+
+/* Custom styles for the md-select element to remove underline */
+.no-underline .md-select-value {
+  border-bottom: none !important; /* Remove the underline */
+  
+}
+
+/* Hide the selected value */
+.hide-selected-value .md-select-value .md-text {
+  display: none !important; /* Hide the selected value */
+}
+
+/* Set a custom width for the md-select element */
+.custom-width {
+  width: 1px !important; /* Adjust the width as needed */
+}
+
+/* Hide the dropdown arrow */
+.no-arrow .md-select-icon {
+  display: none !important; /* Hide the dropdown arrow */
+}
+
+/* Remove the scrollbar and display all options */
+.no-scroll .md-select-menu-container,
+.no-scroll .md-select-menu {
+  max-height: none !important; /* Remove the max-height */
+  overflow-y: visible !important; /* Ensure the dropdown is fully visible */
+}
+
+.md-menu-item {
+  z-index: 1000 !important; /* Ensure the menu items are above the toolbar */
+}
+
